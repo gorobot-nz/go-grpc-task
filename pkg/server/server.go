@@ -11,12 +11,12 @@ import (
 
 type challengeServiceServer struct {
 	challenge.UnimplementedChallengeServiceServer
-	client *bitlyClient.BitlyClient
+	bClient *bitlyClient.BitlyClient
 }
 
 func NewServer(bClient *bitlyClient.BitlyClient) *grpc.Server {
 	server := grpc.NewServer()
-	challenge.RegisterChallengeServiceServer(server, &challengeServiceServer{client: bClient})
+	challenge.RegisterChallengeServiceServer(server, &challengeServiceServer{bClient: bClient})
 	return server
 }
 
@@ -31,9 +31,14 @@ func Run(server *grpc.Server, port string) error {
 	return nil
 }
 
+func (s *challengeServiceServer) ReadMetadata(ctx context.Context, placeholder *challenge.Placeholder) (*challenge.Placeholder, error) {
+	metadata := placeholder.GetData()
+	return &challenge.Placeholder{Data: metadata}, nil
+}
+
 func (s *challengeServiceServer) MakeShortLink(ctx context.Context, link *challenge.Link) (*challenge.Link, error) {
 	data := link.GetData()
-	resp, err := s.client.ShortLink(data)
+	resp, err := s.bClient.ShortLink(data)
 	if err != nil {
 		return nil, err
 	}
