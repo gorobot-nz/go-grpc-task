@@ -7,6 +7,7 @@ import (
 	challenge "github.com/gorobot-nz/go-grpc-task/pkg/gen/pkg/proto"
 	"google.golang.org/grpc"
 	"net"
+	"time"
 )
 
 type timerSubscribers struct {
@@ -53,6 +54,18 @@ func (s *challengeServiceServer) MakeShortLink(ctx context.Context, link *challe
 }
 
 func (s *challengeServiceServer) StartTimer(timer *challenge.Timer, timerServer challenge.ChallengeService_StartTimerServer) error {
-
+	err := s.timerClient.CreateTimer(timer)
+	if err != nil {
+		return err
+	}
+	for {
+		seconds, err := s.timerClient.GetRemainingSeconds(timer)
+		if err != nil {
+			break
+		}
+		err = timerServer.Send(&challenge.Timer{Name: timer.Name, Seconds: seconds})
+		time.Sleep(time.Duration(timer.Frequency) * time.Second)
+	}
+	timerServer.SendMsg("Timer off")
 	return nil
 }

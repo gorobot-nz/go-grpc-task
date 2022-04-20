@@ -19,31 +19,34 @@ func NewTimerClient() *TimerClient {
 	return &TimerClient{client: &http.Client{}}
 }
 
-func (c *TimerClient) CreateTimer(timer *challenge.Timer) (bool, error) {
+func (c *TimerClient) CreateTimer(timer *challenge.Timer) error {
 	req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("https://timercheck.io/%s", timer.Name), nil)
 	res, err := c.client.Do(req)
 	if err != nil {
-		return false, err
+		return err
 	}
 	if res.StatusCode == http.StatusGatewayTimeout {
 		createReq, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("https://timercheck.io/%s/%d", timer.Name, timer.Seconds), nil)
 		createRes, err := c.client.Do(createReq)
 		if err != nil {
-			return false, err
+			return err
 		}
 		if createRes.StatusCode != 200 {
-			return false, errors.New("Something goes wrong")
+			return errors.New("Something goes wrong")
 		}
-		return false, nil
+		return nil
 	}
-	return true, nil
+	return nil
 }
 
-func (c *TimerClient) GetRemainingSeconds(timer *challenge.Timer) (int, error) {
+func (c *TimerClient) GetRemainingSeconds(timer *challenge.Timer) (int64, error) {
 	req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("https://timercheck.io/%s", timer.Name), nil)
 	res, err := c.client.Do(req)
 	if err != nil {
 		return 0, err
+	}
+	if res.StatusCode != http.StatusOK {
+		return 0, errors.New("Timer off")
 	}
 	var timerResponse responses.TimerResponse
 	bodyText, err := ioutil.ReadAll(res.Body)
