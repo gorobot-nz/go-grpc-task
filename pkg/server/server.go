@@ -3,20 +3,26 @@ package server
 import (
 	"context"
 	"fmt"
-	"github.com/gorobot-nz/go-grpc-task/pkg/bitlyClient"
+	"github.com/gorobot-nz/go-grpc-task/pkg/apiClients"
 	challenge "github.com/gorobot-nz/go-grpc-task/pkg/gen/pkg/proto"
 	"google.golang.org/grpc"
 	"net"
 )
 
-type challengeServiceServer struct {
-	challenge.UnimplementedChallengeServiceServer
-	bClient *bitlyClient.BitlyClient
+type timerSubscribers struct {
+	timer       *challenge.Timer
+	subscribers []*challenge.ChallengeService_StartTimerServer
 }
 
-func NewServer(bClient *bitlyClient.BitlyClient) *grpc.Server {
+type challengeServiceServer struct {
+	challenge.UnimplementedChallengeServiceServer
+	bClient     *apiclients.BitlyClient
+	timerClient *apiclients.TimerClient
+}
+
+func NewServer(bClient *apiclients.BitlyClient, tClient *apiclients.TimerClient) *grpc.Server {
 	server := grpc.NewServer()
-	challenge.RegisterChallengeServiceServer(server, &challengeServiceServer{bClient: bClient})
+	challenge.RegisterChallengeServiceServer(server, &challengeServiceServer{bClient: bClient, timerClient: tClient})
 	return server
 }
 
@@ -44,4 +50,9 @@ func (s *challengeServiceServer) MakeShortLink(ctx context.Context, link *challe
 	}
 
 	return &challenge.Link{Data: resp}, nil
+}
+
+func (s *challengeServiceServer) StartTimer(timer *challenge.Timer, timerServer challenge.ChallengeService_StartTimerServer) error {
+
+	return nil
 }

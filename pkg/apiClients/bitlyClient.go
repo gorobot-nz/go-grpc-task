@@ -1,7 +1,9 @@
 package apiclients
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/gorobot-nz/go-grpc-task/pkg/responses"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -35,5 +37,10 @@ func (c *BitlyClient) ShortLink(url string) (string, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return string(bodyText), nil
+	var bitlyResponse responses.BitlyResponse
+	err = json.Unmarshal(bodyText, &bitlyResponse)
+	if err != nil {
+		return "", err
+	}
+	return bitlyResponse.Link, nil
 }
