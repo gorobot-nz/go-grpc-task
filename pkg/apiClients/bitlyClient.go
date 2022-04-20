@@ -1,4 +1,4 @@
-package bitlyClient
+package apiclients
 
 import (
 	"fmt"
@@ -19,11 +19,11 @@ func NewBitlyClient(token string) *BitlyClient {
 
 func (c *BitlyClient) ShortLink(url string) (string, error) {
 	data := strings.NewReader(fmt.Sprintf(`{ "long_url": %s }`, url))
-	req, err := http.NewRequest("POST", "https://api-ssl.bitly.com/v4/shorten", data)
+	req, err := http.NewRequest(http.MethodPost, "https://api-ssl.bitly.com/v4/shorten", data)
 	if err != nil {
 		log.Fatal(err)
 	}
-	req.Header.Set("Authorization", "Bearer {TOKEN}")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.token))
 	req.Header.Set("Content-Type", "application/json")
 
 	res, err := c.client.Do(req)
