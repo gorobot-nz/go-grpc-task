@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gorobot-nz/go-grpc-task/pkg/apiClients"
 	challenge "github.com/gorobot-nz/go-grpc-task/pkg/gen/pkg/proto"
+	"github.com/zpnk/go-bitly"
 	"google.golang.org/grpc"
 	"net"
 	"time"
@@ -17,11 +18,11 @@ type timerSubscribers struct {
 
 type challengeServiceServer struct {
 	challenge.UnimplementedChallengeServiceServer
-	bClient     *apiclients.BitlyClient
+	bClient     *bitly.Client
 	timerClient *apiclients.TimerClient
 }
 
-func NewServer(bClient *apiclients.BitlyClient, tClient *apiclients.TimerClient) *grpc.Server {
+func NewServer(bClient *bitly.Client, tClient *apiclients.TimerClient) *grpc.Server {
 	server := grpc.NewServer()
 	challenge.RegisterChallengeServiceServer(server, &challengeServiceServer{bClient: bClient, timerClient: tClient})
 	return server
@@ -47,12 +48,13 @@ func (s *challengeServiceServer) ReadMetadata(ctx context.Context, placeholder *
 func (s *challengeServiceServer) MakeShortLink(ctx context.Context, link *challenge.Link) (*challenge.Link, error) {
 	fmt.Println("Make short link")
 	data := link.GetData()
-	resp, err := s.bClient.ShortLink(data)
+	resp, err := s.bClient.Links.Shorten(data)
+	fmt.Println(resp.URL)
 	if err != nil {
 		return nil, err
 	}
 
-	return &challenge.Link{Data: resp}, nil
+	return &challenge.Link{Data: resp.URL}, nil
 }
 
 func (s *challengeServiceServer) StartTimer(timer *challenge.Timer, timerServer challenge.ChallengeService_StartTimerServer) error {
