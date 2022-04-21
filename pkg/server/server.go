@@ -46,10 +46,8 @@ func (s *challengeServiceServer) ReadMetadata(ctx context.Context, placeholder *
 }
 
 func (s *challengeServiceServer) MakeShortLink(ctx context.Context, link *challenge.Link) (*challenge.Link, error) {
-	fmt.Println("Make short link")
 	data := link.GetData()
 	resp, err := s.bClient.Links.Shorten(data)
-	fmt.Println(resp.URL)
 	if err != nil {
 		return nil, err
 	}
@@ -64,6 +62,7 @@ func (s *challengeServiceServer) StartTimer(timer *challenge.Timer, timerServer 
 	}
 	for {
 		seconds, err := s.timerClient.GetRemainingSeconds(timer)
+		fmt.Println("Get timer")
 		if err != nil {
 			break
 		}
