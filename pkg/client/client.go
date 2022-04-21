@@ -112,7 +112,7 @@ func (c *Client) help() {
 	fmt.Println("Example usage")
 	fmt.Println("\tmeta data(string)")
 	fmt.Println("\tshort link(string)")
-	fmt.Println("\ttimer name(string) time(int) frequency(time)")
+	fmt.Println("\ttimer name(string) time(int) frequency(int)")
 	fmt.Println("\tquit")
 	fmt.Println("Good luck")
 }

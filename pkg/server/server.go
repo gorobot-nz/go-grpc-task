@@ -34,6 +34,7 @@ func Run(server *grpc.Server, port string) error {
 		return fmt.Errorf("failed to listen on %s: %w", port, err)
 	}
 	fmt.Println("Server start")
+	fmt.Sprintf("Port start %s", port)
 	if err := server.Serve(listener); err != nil {
 		return fmt.Errorf("failed to serve gRPC server: %w", err)
 	}
