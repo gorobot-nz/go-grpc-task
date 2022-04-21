@@ -39,14 +39,14 @@ func (c *TimerClient) CreateTimer(timer *challenge.Timer) error {
 	return nil
 }
 
-func (c *TimerClient) GetRemainingSeconds(timer *challenge.Timer) (int64, error) {
+func (c *TimerClient) GetRemainingSeconds(timer *challenge.Timer) (json.Number, error) {
 	req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("https://timercheck.io/%s", timer.Name), nil)
 	res, err := c.client.Do(req)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 	if res.StatusCode != http.StatusOK {
-		return 0, errors.New("Timer off")
+		return "", errors.New("Timer off")
 	}
 	var timerResponse responses.TimerResponse
 	bodyText, err := ioutil.ReadAll(res.Body)
@@ -55,7 +55,7 @@ func (c *TimerClient) GetRemainingSeconds(timer *challenge.Timer) (int64, error)
 	}
 	err = json.Unmarshal(bodyText, &timerResponse)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 	return timerResponse.SecondsRemaining, nil
 }

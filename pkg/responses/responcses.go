@@ -1,7 +1,9 @@
 package responses
 
+import "encoding/json"
+
 type TimerResponse struct {
-	SecondsRemaining int64 `json:"seconds-remaining"`
+	SecondsRemaining json.Number `json:"seconds-remaining"`
 }
 
 type BitlyResponse struct {

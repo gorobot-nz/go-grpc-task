@@ -32,6 +32,7 @@ func Run(server *grpc.Server, port string) error {
 	if err != nil {
 		return fmt.Errorf("failed to listen on %s: %w", port, err)
 	}
+	fmt.Println("Server start")
 	if err := server.Serve(listener); err != nil {
 		return fmt.Errorf("failed to serve gRPC server: %w", err)
 	}
@@ -44,6 +45,7 @@ func (s *challengeServiceServer) ReadMetadata(ctx context.Context, placeholder *
 }
 
 func (s *challengeServiceServer) MakeShortLink(ctx context.Context, link *challenge.Link) (*challenge.Link, error) {
+	fmt.Println("Make short link")
 	data := link.GetData()
 	resp, err := s.bClient.ShortLink(data)
 	if err != nil {
@@ -63,9 +65,9 @@ func (s *challengeServiceServer) StartTimer(timer *challenge.Timer, timerServer 
 		if err != nil {
 			break
 		}
-		err = timerServer.Send(&challenge.Timer{Name: timer.Name, Seconds: seconds})
+		f, _ := seconds.Int64()
+		err = timerServer.Send(&challenge.Timer{Name: timer.Name, Seconds: f})
 		time.Sleep(time.Duration(timer.Frequency) * time.Second)
 	}
-	timerServer.SendMsg("Timer off")
 	return nil
 }

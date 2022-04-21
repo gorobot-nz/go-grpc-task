@@ -3,7 +3,6 @@ package apiclients
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gorobot-nz/go-grpc-task/pkg/responses"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -20,7 +19,7 @@ func NewBitlyClient(token string) *BitlyClient {
 }
 
 func (c *BitlyClient) ShortLink(url string) (string, error) {
-	data := strings.NewReader(fmt.Sprintf(`{ "long_url": %s }`, url))
+	data := strings.NewReader(fmt.Sprintf(`{ "group_guid": "Om4kiD06vDg", "domain": "bit.ly", "long_url": "%s" }`, url))
 	req, err := http.NewRequest(http.MethodPost, "https://api-ssl.bitly.com/v4/shorten", data)
 	if err != nil {
 		log.Fatal(err)
@@ -37,10 +36,10 @@ func (c *BitlyClient) ShortLink(url string) (string, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	var bitlyResponse responses.BitlyResponse
+	var bitlyResponse map[string]interface{}
 	err = json.Unmarshal(bodyText, &bitlyResponse)
 	if err != nil {
 		return "", err
 	}
-	return bitlyResponse.Link, nil
+	return "", nil
 }

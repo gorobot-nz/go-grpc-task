@@ -7,10 +7,10 @@ import (
 )
 
 func main() {
-	bitlyClient := apiclients.NewBitlyClient("49531020c64e26d600955a9c6d4f198a3543d7c0")
+	bitlyClient := apiclients.NewBitlyClient("2f6a141a4b9961f2424e76d35b19b126b1368852")
 	timerClient := apiclients.NewTimerClient()
 	server := serverPkg.NewServer(bitlyClient, timerClient)
-	err := serverPkg.Run(server, "8080")
+	err := serverPkg.Run(server, "127.0.0.1:8080")
 	if err != nil {
 		log.Fatal(err)
 	}
