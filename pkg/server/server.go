@@ -11,11 +11,6 @@ import (
 	"time"
 )
 
-type timerSubscribers struct {
-	timer       *challenge.Timer
-	subscribers []*challenge.ChallengeService_StartTimerServer
-}
-
 type challengeServiceServer struct {
 	challenge.UnimplementedChallengeServiceServer
 	bClient     *bitly.Client
